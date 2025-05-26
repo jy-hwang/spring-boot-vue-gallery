@@ -1,8 +1,7 @@
 package org.africalib.gallery.service;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
@@ -11,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 public class JwtServiceImpl implements JwtService {
 
   private static String SECRET_KEY = System.getenv("MY_SECRET_KEY");
@@ -19,7 +19,7 @@ public class JwtServiceImpl implements JwtService {
   public String getToken(String key, Object value) {
 
     Date expTime = new Date();
-    expTime.setTime(expTime.getTime() + 1000 * 60 * 30);
+    expTime.setTime(expTime.getTime() + 1000 * 60 * 30); // 30m
     byte[] secretByteKey = DatatypeConverter.parseBase64Binary(SECRET_KEY);
     Key signKey = new SecretKeySpec(secretByteKey, SignatureAlgorithm.HS256.getJcaName());
 
@@ -36,5 +36,27 @@ public class JwtServiceImpl implements JwtService {
             .signWith(signKey, SignatureAlgorithm.HS256);
 
     return builder.compact();
+  }
+
+  @Override
+  public Claims getClaim(String token) {
+    if(token != null && !token.isEmpty()) {
+      try {
+        byte[] secretByteKey = DatatypeConverter.parseBase64Binary(SECRET_KEY);
+        Key signKey = new SecretKeySpec(secretByteKey, SignatureAlgorithm.HS256.getJcaName());
+
+        return Jwts.parserBuilder()
+            .setSigningKey(signKey)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+      } catch (ExpiredJwtException e){
+        e.printStackTrace();
+      } catch(JwtException e2){
+        e2.printStackTrace();
+      }
+    }
+
+    return null;
   }
 }
