@@ -4,12 +4,14 @@ import Cart from "@/pages/Cart.vue";
 import { createWebHistory } from "vue-router";
 import { createRouter } from "vue-router";
 import Order from "@/pages/Order.vue";
+import Orders from "@/pages/Orders.vue";
 
 const routes = [
   { path: "/", component: Home },
   { path: "/login", component: Login },
   { path: "/cart", component: Cart },
   { path: "/order", component: Order },
+  { path: "/orders", component: Orders },
 ];
 const router = createRouter({
   history: createWebHistory(),

@@ -9,6 +9,9 @@
               <li>
                 <router-link to="/" class="text-white">메인 화면</router-link>
               </li>
+              <li v-if="$store.state.account.id">
+                <router-link to="/orders" class="text-white">주문내역</router-link>
+              </li>
               <li>
                 <router-link to="/login" class="text-white" v-if="!$store.state.account.id">로그인</router-link>
                 <a to="/logout" class="text-white" @click="logout()" v-else>로그아웃</a>
