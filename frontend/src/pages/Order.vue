@@ -11,7 +11,12 @@
         </div>
         <div class="row g-5">
           <div class="col-md-5 col-lg-4 order-md-last">
-            <h4 class="d-flex justify-content-between align-items-center mb-3"><span class="text-primary">구입 목록</span> <span class="badge bg-primary rounded-pill">3</span></h4>
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-primary">구입 목록</span>
+              <span class="badge bg-primary rounded-pill">
+                {{ state.items.length }}
+              </span>
+            </h4>
             <ul class="list-group mb-3">
               <li class="list-group-item d-flex justify-content-between lh-sm" v-for="(i, idx) in state.items" :key="idx">
                 <div>
@@ -27,16 +32,16 @@
           </div>
           <div class="col-md-7 col-lg-8">
             <h4 class="mb-3">주문자 정보</h4>
-            <form class="needs-validation" novalidate>
+            <div class="needs-validation" novalidate>
               <div class="row g-3">
                 <div class="col-12">
                   <label for="username" class="form-label">이름</label>
-                  <input type="text" class="form-control" id="username" placeholder="Username" required />
+                  <input type="text" class="form-control" id="username" placeholder="Username" v-model="state.form.name" />
                   <div class="invalid-feedback">Your username is required.</div>
                 </div>
                 <div class="col-12">
                   <label for="address" class="form-label">주소</label>
-                  <input type="text" class="form-control" id="address" placeholder="1234 Main St" required />
+                  <input type="text" class="form-control" id="address" placeholder="1234 Main St" v-model="state.form.address" />
                   <div class="invalid-feedback">Please enter your shipping address.</div>
                 </div>
               </div>
@@ -44,23 +49,23 @@
               <h4 class="mb-3">Payment</h4>
               <div class="my-3">
                 <div class="form-check">
-                  <input id="credit" name="paymentMethod" type="radio" class="form-check-input" checked required />
-                  <label class="form-check-label" for="credit">신용카드</label>
+                  <input id="card" name="paymentMethod" type="radio" class="form-check-input" v-model="state.form.payment" value="card" />
+                  <label class="form-check-label" for="card">신용카드</label>
                 </div>
                 <div class="form-check">
-                  <input id="debit" name="paymentMethod" type="radio" class="form-check-input" required />
-                  <label class="form-check-label" for="debit">무통장 입금</label>
+                  <input id="bank" name="paymentMethod" type="radio" class="form-check-input" v-model="state.form.payment" value="bank" />
+                  <label class="form-check-label" for="bank">무통장 입금</label>
                 </div>
               </div>
               <div class="row gy-3">
                 <div class="col-md-6">
-                  <label for="cc-name" class="form-label">카드번호</label>
-                  <input type="text" class="form-control" id="cc-name" placeholder="" required />
+                  <label for="cardNumber" class="form-label">카드번호</label>
+                  <input type="text" class="form-control" id="cardNumber" placeholder="" v-model="state.form.cardNumber" />
                 </div>
               </div>
               <hr class="my-4" />
-              <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
-            </form>
+              <button class="w-100 btn btn-primary btn-lg" @click="submit()">결제하기</button>
+            </div>
           </div>
         </div>
       </main>
@@ -75,12 +80,28 @@ export default {
   setup() {
     const state = reactive({
       items: [],
+      form: {
+        name: "",
+        address: "",
+        payment: "",
+        cardNumber: "",
+        items: "",
+      },
     });
 
     const load = () => {
       axios.get("/api/cart/items/").then(({ data }) => {
         console.log(data);
         state.items = data;
+      });
+    };
+
+    const submit = () => {
+      const args = JSON.parse(JSON.stringify(state.form));
+      args.items = JSON.stringify(state.items);
+
+      axios.post("/api/orders", args).then(() => {
+        console.log("success");
       });
     };
 
@@ -94,7 +115,7 @@ export default {
       return result;
     });
     load();
-    return { lib, state, computedPrice };
+    return { lib, state, computedPrice, submit };
   },
 };
 </script>
