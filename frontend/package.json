@@ -10,7 +10,9 @@
   "dependencies": {
     "axios": "^1.9.0",
     "core-js": "^3.8.3",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-router": "^4.5.1",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -35,6 +37,7 @@
     },
     "rules": {
       "vue/multi-word-component-names": 0,
+      "eslint-plugin-vue/no-unused-components": "off",
       "eslint-plugin-vue/multi-word-component-names": "off",
       "eslint-plugin-vue/no-unused-vars": "off",
       "no-unused-vars": "off"
