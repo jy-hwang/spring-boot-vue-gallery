@@ -13,7 +13,7 @@ import java.util.Map;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-  private static String SECRET_KEY = System.getenv("MY_SECRET_KEY");
+  private static final String SECRET_KEY = System.getenv("MY_SECRET_KEY");
 
   @Override
   public String getToken(String key, Object value) {
@@ -31,16 +31,16 @@ public class JwtServiceImpl implements JwtService {
     map.put(key, value);
 
     JwtBuilder builder = Jwts.builder().setHeader(headerMap)
-            .setClaims(map)
-            .setExpiration(expTime)
-            .signWith(signKey, SignatureAlgorithm.HS256);
+        .setClaims(map)
+        .setExpiration(expTime)
+        .signWith(signKey, SignatureAlgorithm.HS256);
 
     return builder.compact();
   }
 
   @Override
   public Claims getClaim(String token) {
-    if(token != null && !token.isEmpty()) {
+    if (token != null && !token.isEmpty()) {
       try {
         byte[] secretByteKey = DatatypeConverter.parseBase64Binary(SECRET_KEY);
         Key signKey = new SecretKeySpec(secretByteKey, SignatureAlgorithm.HS256.getJcaName());
@@ -50,9 +50,9 @@ public class JwtServiceImpl implements JwtService {
             .build()
             .parseClaimsJws(token)
             .getBody();
-      } catch (ExpiredJwtException e){
+      } catch (ExpiredJwtException e) {
         e.printStackTrace();
-      } catch(JwtException e2){
+      } catch (JwtException e2) {
         e2.printStackTrace();
       }
     }
@@ -63,7 +63,7 @@ public class JwtServiceImpl implements JwtService {
   @Override
   public int getId(String token) {
     Claims claims = this.getClaim(token);
-    if(claims != null) {
+    if (claims != null) {
       return Integer.parseInt(claims.get("id").toString());
     }
     return 0;
