@@ -76,6 +76,7 @@
 import { computed, reactive } from "vue";
 import lib from "@/scripts/lib";
 import axios from "axios";
+import router from "@/scripts/router";
 export default {
   setup() {
     const state = reactive({
@@ -91,7 +92,6 @@ export default {
 
     const load = () => {
       axios.get("/api/cart/items/").then(({ data }) => {
-        console.log(data);
         state.items = data;
       });
     };
@@ -101,7 +101,7 @@ export default {
       args.items = JSON.stringify(state.items);
 
       axios.post("/api/orders", args).then(() => {
-        console.log("success");
+        router.push({ path: "/orders" });
       });
     };
 

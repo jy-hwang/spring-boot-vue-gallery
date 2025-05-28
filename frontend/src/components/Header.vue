@@ -41,7 +41,7 @@
           </svg>
           <strong>Gallery</strong>
         </router-link>
-        <router-link to="cart" class="cart btn">
+        <router-link to="cart" class="cart btn" v-if="$store.state.account.id">
           <i class="fa fa-shopping-cart" aria-hidden="true"></i>
         </router-link>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,15 +55,17 @@
 <script>
 import router from "@/scripts/router";
 import store from "@/scripts/store";
+import axios from "axios";
 
 export default {
   name: "Header",
   setup() {
     const logout = () => {
-      store.commit("setAccount", 0);
-      sessionStorage.removeItem("id");
-      router.push({
-        path: "/",
+      axios.post("/api/account/logout").then(() => {
+        store.commit("setAccount", 0);
+        router.push({
+          path: "/",
+        });
       });
     };
     return { logout };
@@ -76,5 +78,9 @@ export default {
 header .navbar .cart {
   margin-left: auto;
   color: #fff;
+}
+
+header ul li a {
+  cursor: pointer;
 }
 </style>
