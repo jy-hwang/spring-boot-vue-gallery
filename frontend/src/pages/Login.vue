@@ -2,11 +2,11 @@
   <div class="form-signin">
     <h1 class="h3 mb-3 fw-normal">Sign in Form</h1>
     <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" v-model="state.form.email" />
+      <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com" @keyup.enter="submit()" v-model="state.form.email" ref="emailInput" />
       <label for="floatingInput">Email address</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" v-model="state.form.password" />
+      <input type="password" class="form-control" id="floatingPassword" placeholder="Password" @keyup.enter="submit()" v-model="state.form.password" ref="passwordInput" />
       <label for="floatingPassword">Password</label>
     </div>
 
@@ -18,7 +18,7 @@
 import router from "@/scripts/router";
 import store from "@/scripts/store";
 import axios from "axios";
-import { reactive } from "vue";
+import { nextTick, reactive, ref } from "vue";
 
 export default {
   setup() {
@@ -29,7 +29,30 @@ export default {
       },
     });
 
+    const emailInput = ref(null);
+    const passwordInput = ref(null);
+
     const submit = () => {
+      if (state.form.email == "") {
+        window.alert("이메일을 입력해주세요");
+        nextTick(() => {
+          if (emailInput.value) {
+            emailInput.value.focus();
+          }
+        });
+        return;
+      }
+
+      if (state.form.password == "") {
+        window.alert("비밀번호를 입력해주세요");
+        nextTick(() => {
+          if (passwordInput.value) {
+            passwordInput.value.focus();
+          }
+        });
+        return;
+      }
+
       axios
         .post("/api/account/login", state.form)
         .then((res) => {
@@ -43,7 +66,7 @@ export default {
           window.alert("로그인 정보가 존재하지 않습니다.");
         });
     };
-    return { state, submit };
+    return { state, submit, emailInput, passwordInput };
   },
 };
 </script>

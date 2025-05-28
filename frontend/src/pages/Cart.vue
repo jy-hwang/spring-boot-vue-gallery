@@ -21,7 +21,6 @@ export default {
   setup() {
     const load = () => {
       axios.get("/api/cart/items/").then(({ data }) => {
-        console.log(data);
         state.items = data;
       });
     };

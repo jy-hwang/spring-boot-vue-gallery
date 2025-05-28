@@ -36,17 +36,17 @@
               <div class="row g-3">
                 <div class="col-12">
                   <label for="username" class="form-label">이름</label>
-                  <input type="text" class="form-control" id="username" placeholder="Username" v-model="state.form.name" />
+                  <input type="text" class="form-control" id="username" placeholder="Username" v-model="state.form.name" ref="nameInput" />
                   <div class="invalid-feedback">Your username is required.</div>
                 </div>
                 <div class="col-12">
                   <label for="address" class="form-label">주소</label>
-                  <input type="text" class="form-control" id="address" placeholder="1234 Main St" v-model="state.form.address" />
+                  <input type="text" class="form-control" id="address" placeholder="1234 Main St" v-model="state.form.address" ref="addressInput" />
                   <div class="invalid-feedback">Please enter your shipping address.</div>
                 </div>
               </div>
               <hr class="my-4" />
-              <h4 class="mb-3">Payment</h4>
+              <h4 class="mb-3">결제수단</h4>
               <div class="my-3">
                 <div class="form-check">
                   <input id="card" name="paymentMethod" type="radio" class="form-check-input" v-model="state.form.payment" value="card" />
@@ -60,7 +60,7 @@
               <div class="row gy-3">
                 <div class="col-md-6">
                   <label for="cardNumber" class="form-label">카드번호</label>
-                  <input type="text" class="form-control" id="cardNumber" placeholder="" v-model="state.form.cardNumber" />
+                  <input type="text" class="form-control" id="cardNumber" placeholder="" v-model="state.form.cardNumber" ref="cardNumberInput" :disabled="state.form.payment !== 'card'" />
                 </div>
               </div>
               <hr class="my-4" />
@@ -73,7 +73,7 @@
   </div>
 </template>
 <script>
-import { computed, reactive } from "vue";
+import { computed, nextTick, reactive, ref } from "vue";
 import lib from "@/scripts/lib";
 import axios from "axios";
 import router from "@/scripts/router";
@@ -90,6 +90,10 @@ export default {
       },
     });
 
+    const nameInput = ref(null);
+    const addressInput = ref(null);
+    const cardNumberInput = ref(null);
+
     const load = () => {
       axios.get("/api/cart/items/").then(({ data }) => {
         state.items = data;
@@ -97,6 +101,41 @@ export default {
     };
 
     const submit = () => {
+      if (state.form.name == "") {
+        window.alert("이름을 입력해주세요");
+        nextTick(() => {
+          if (nameInput.value) {
+            nameInput.value.focus();
+          }
+        });
+        return;
+      }
+
+      if (state.form.address == "") {
+        window.alert("주소를 입력해주세요");
+        nextTick(() => {
+          if (addressInput.value) {
+            addressInput.value.focus();
+          }
+        });
+        return;
+      }
+
+      if (state.form.payment == "") {
+        window.alert("결제수단을 입력해주세요");
+        return;
+      }
+
+      if (state.form.payment == "card" && state.form.cardNumber == "") {
+        window.alert("카드번호를 입력해주세요");
+        nextTick(() => {
+          if (cardNumberInput.value) {
+            cardNumberInput.value.focus();
+          }
+        });
+        return;
+      }
+
       const args = JSON.parse(JSON.stringify(state.form));
       args.items = JSON.stringify(state.items);
 
@@ -115,7 +154,7 @@ export default {
       return result;
     });
     load();
-    return { lib, state, computedPrice, submit };
+    return { lib, state, computedPrice, submit, nameInput, addressInput, cardNumberInput };
   },
 };
 </script>
